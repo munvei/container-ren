@@ -27,7 +27,7 @@ if ($loggedin) {
 
 } else {
 
-    // check empty
+    // confirm not empty for post string
     $ele = array('name' => 'Name', 'pw' => 'Password');
     $err = array();
 
@@ -53,20 +53,23 @@ if ($loggedin) {
             $stmt->bindValue(1, $ele['name']);
             $res = $stmt->execute();
 
-            // check result
-            if ($res == 1) {
+            // confirm not empty for result
+            if ($res) {
+              $row = $stmt->fetch(PDO::FETCH_ASSOC);
+              if (!empty($row['pw'])) {
                 $sel_flag = true;
-                $row = $stmt->fetch(PDO::FETCH_ASSOC);
+              } else {
+                $mes2 = "ログインに失敗しました";
+              }
             } else {
-                $mes2 = "ccurred database error";
-            } 
-
+              $mes2 = "ccurred database error";
+            }
         } catch (PDOException $e) {
             $mes2 = $e->getMessage();
         }
     }
 
-    // check password and login
+    // confirm password and login
     if ($sel_flag) {
         if (password_verify($ele['pw'], $row['pw'])) {
             $_SESSION['name'] = $ele['name'];
